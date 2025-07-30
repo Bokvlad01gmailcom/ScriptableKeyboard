@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Менеджер скриптов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .script-item {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .script-info {
+            flex: 1;
+        }
+        
+        .script-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        .script-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .script-description {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .script-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .btn-run { background: #4CAF50; color: white; }
+        .btn-edit { background: #2196F3; color: white; }
+        .btn-delete { background: #f44336; color: white; }
+        
+        .add-script {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #ff6b6b;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: #333;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin: 15px 0;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background: #444;
+            color: white;
+            box-sizing: border-box;
+        }
+        
+        .form-group textarea {
+            height: 200px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📜 Менеджер скриптов</h1>
+        <button class="back-btn" onclick="goBack()">← Назад</button>
+    </div>
+    
+    <div id="scriptsList">
+        <!-- Скрипты будут загружены динамически -->
+    </div>
+    
+    <button class="add-script" onclick="showAddScriptModal()">+</button>
+    
+    <!-- Модальное окно для добавления/редактирования скрипта -->
+    <div id="scriptModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Новый скрипт</h2>
+            
+            <div class="form-group">
+                <label>Название:</label>
+                <input type="text" id="scriptName" placeholder="Название скрипта">
+            </div>
+            
+            <div class="form-group">
+                <label>Иконка (эмодзи):</label>
+                <input type="text" id="scriptIcon" placeholder="📜" maxlength="2">
+            </div>
+            
+            <div class="form-group">
+                <label>Описание:</label>
+                <input type="text" id="scriptDescription" placeholder="Описание функции">
+            </div>
+            
+            <div class="form-group">
+                <label>Код JavaScript:</label>
+                <textarea id="scriptCode" placeholder="// Ваш код здесь
+// Доступные объекты:
+// - KeyboardManager.typeText(text) - ввод текста
+// - KeyboardManager.showNotification(text) - уведомление
+// - ScriptManager - управление скриптами
+
+KeyboardManager.typeText('Привет мир!');"></textarea>
+            </div>
+            
+            <div class="script-actions">
+                <button class="btn btn-run" onclick="testScript()">🧪 Тест</button>
+                <button class="btn" onclick="saveScript()" style="background: #4CAF50; color: white;">💾 Сохранить</button>
+                <button class="btn" onclick="closeModal()" style="background: #666; color: white;">❌ Отмена</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="cordova.js"></script>
+    <script src="js/keyboard.js"></script>
+    <script src="js/scripts.js"></script>
+    <script>
+        let currentEditingScript = null;
+        
+        document.addEventListener('deviceready', function() {
+            ScriptManager.init();
+            loadScriptsList();
+        }, false);
+        
+        function loadScriptsList() {
+            const container = document.getElementById('scriptsList');
+            container.innerHTML = '';
+            
+            const scripts = ScriptManager.getAllScripts();
+            
+            scripts.forEach(script => {
+                const item = document.createElement('div');
+                item.className = 'script-item';
+                
+                item.innerHTML = `
+                    <div class="script-info">
+                        <div style="display: flex; align-items: center;">
+                            <span class="script-icon">${script.icon}</span>
+                            <div>
+                                <div class="script-name">${script.name}</div>
+                                <div class="script-description">${script.description}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="script-actions">
+                        <button class="btn btn-run" onclick="runScript('${script.id}')">▶️</button>
+                        ${script.userCreated ? `
+                            <button class="btn btn-edit" onclick="editScript('${script.id}')">✏️</button>
+                            <button class="btn btn-delete" onclick="deleteScript('${script.id}')">🗑️</button>
+                        ` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+        
+        function runScript(scriptId) {
+            ScriptManager.executeScript(scriptId);
+        }
+        
+        function editScript(scriptId) {
+            const script = ScriptManager.getAllScripts().find(s => s.id === scriptId);
+            if (script) {
+                currentEditingScript = script;
+                document.getElementById('modalTitle').textContent = 'Редактировать скрипт';
+                document.getElementById('scriptName').value = script.name;
+                document.getElementById('scriptIcon').value = script.icon;
+                document.getElementById('scriptDescription').value = script.description;
+                document.getElementById('scriptCode').value = script.code;
+                showAddScriptModal();
+            }
+        }
+        
+        function deleteScript(scriptId) {
+            if (confirm('Удалить этот скрипт?')) {
+                ScriptManager.deleteScript(scriptId);
+                loadScriptsList();
+            }
+        }
+        
+        function showAddScriptModal() {
+            document.getElementById('scriptModal').style.display = 'block';
+            if (!currentEditingScript) {
+                // Очищаем форму для нового скрипта
+                document.getElementById('modalTitle').textContent = 'Новый скрипт';
+                document.getElementById('scriptName').value = '';
+                document.getElementById('scriptIcon').value = '📜';
+                document.getElementById('scriptDescription').value = '';
+                document.getElementById('scriptCode').value = '';
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('scriptModal').style.display = 'none';
+            currentEditingScript = null;
+        }
+        
+        function testScript() {
+            const code = document.getElementById('scriptCode').value;
+            if (code.trim()) {
+                try {
+                    const func = new Function('KeyboardManager', 'ScriptManager', code);
+                    func(KeyboardManager, ScriptManager);
+                } catch (e) {
+                    alert('Ошибка в коде: ' + e.message);
+                }
+            }
+        }
+        
+        function saveScript() {
+            const name = document.getElementById('scriptName').value;
+            const icon = document.getElementById('scriptIcon').value || '📜';
+            const description = document.getElementById('scriptDescription').value;
+            const code = document.getElementById('scriptCode').value;
+            
+            if (!name || !code) {
+                alert('Заполните название и код скрипта');
+                return;
+            }
+            
+            if (currentEditingScript) {
+                // Редактируем существующий
+                currentEditingScript.name = name;
+                currentEditingScript.icon = icon;
+                currentEditingScript.description = description;
+                currentEditingScript.code = code;
+                ScriptManager.saveUserScripts();
+            } else {
+                // Создаем новый
+                ScriptManager.createScript(name, code, icon);
+            }
+            
+            closeModal();
+            loadScriptsList();
+        }
+        
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

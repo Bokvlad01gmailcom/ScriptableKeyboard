@@ -2,11 +2,15 @@
 node_modules/
 npm-debug.log*
 
-# Cordova
-platforms/
-plugins/cordova-plugin-whitelist/
-plugins/cordova-plugin-file/
-plugins/cordova-plugin-device/
+# Cordova build files
+platforms/android/app/build/
+platforms/android/app/.gradle/
+platforms/android/CordovaLib/build/
+platforms/android/gradle/
+
+# Keep important Android files
+!platforms/android/app/src/
+!platforms/android/app/res/
 
 # Build outputs
 *.apk
@@ -22,3 +26,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Temporary files
+tmp_*
