@@ -30,27 +30,6 @@
         <!-- Настройки WebView -->
         <preference name="AndroidInsecureFileModeEnabled" value="true" />
         
-        <!-- КЛЮЧЕВОЕ: Добавляем InputMethodService -->
-        <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <service android:name="com.scriptable.keyboard.KeyboardService"
-                android:permission="android.permission.BIND_INPUT_METHOD"
-                android:exported="true">
-                <intent-filter>
-                    <action android:name="android.view.InputMethod" />
-                </intent-filter>
-                <meta-data android:name="android.view.im"
-                    android:resource="@xml/method" />
-            </service>
-        </config-file>
-        
-        <!-- Добавляем разрешения в манифест -->
-        <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-            <uses-permission android:name="android.permission.RECORD_AUDIO" />
-            <uses-permission android:name="android.permission.VIBRATE" />
-            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-        </config-file>
     </platform>
     
     <!-- Плагины -->
