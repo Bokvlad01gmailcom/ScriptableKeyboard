@@ -18,6 +18,12 @@ function onDeviceReady() {
     // Инициализируем систему скриптов
     ScriptManager.init();
     
+    // Автозапуск удаленной отладки
+    setTimeout(() => {
+        RemoteDebug.start();
+        WebServer.start();
+    }, 2000);
+    
     Debug.info('App initialization completed');
 }
 
