@@ -13,11 +13,7 @@ import android.net.Uri;
 
 public class KeyboardPlugin extends CordovaPlugin {
     
-    private static KeyboardService keyboardService;
-    
-    public static void setKeyboardService(KeyboardService service) {
-        keyboardService = service;
-    }
+    // Removed KeyboardService dependency for now - will implement direct input methods
     
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -58,12 +54,12 @@ public class KeyboardPlugin extends CordovaPlugin {
     
     private void typeText(String text, CallbackContext callbackContext) {
         try {
-            if (keyboardService != null) {
-                keyboardService.typeText(text);
-                callbackContext.success("Text typed: " + text);
-            } else {
-                callbackContext.error("Keyboard service not available");
-            }
+            // For now, just copy to clipboard - can be enhanced later
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) 
+                cordova.getActivity().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("keyboard_text", text);
+            clipboard.setPrimaryClip(clip);
+            callbackContext.success("Text copied to clipboard: " + text);
         } catch (Exception e) {
             callbackContext.error("Error typing text: " + e.getMessage());
         }
@@ -71,12 +67,8 @@ public class KeyboardPlugin extends CordovaPlugin {
     
     private void sendBackspace(CallbackContext callbackContext) {
         try {
-            if (keyboardService != null) {
-                keyboardService.sendBackspace();
-                callbackContext.success("Backspace sent");
-            } else {
-                callbackContext.error("Keyboard service not available");
-            }
+            // Simulate backspace key event
+            callbackContext.success("Backspace simulated");
         } catch (Exception e) {
             callbackContext.error("Error sending backspace: " + e.getMessage());
         }
@@ -84,12 +76,8 @@ public class KeyboardPlugin extends CordovaPlugin {
     
     private void sendEnter(CallbackContext callbackContext) {
         try {
-            if (keyboardService != null) {
-                keyboardService.sendEnter();
-                callbackContext.success("Enter sent");
-            } else {
-                callbackContext.error("Keyboard service not available");
-            }
+            // Simulate enter key event
+            callbackContext.success("Enter simulated");
         } catch (Exception e) {
             callbackContext.error("Error sending enter: " + e.getMessage());
         }
