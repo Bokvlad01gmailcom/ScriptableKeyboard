@@ -6,13 +6,6 @@
     
     <content src="index.html" />
     
-    <!-- Разрешения для клавиатуры -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
     
     <!-- Настройки Android -->
     <platform name="android">
@@ -23,9 +16,13 @@
         <preference name="android-targetSdkVersion" value="34" />
         <preference name="android-compileSdkVersion" value="34" />
         
-        <!-- Разрешить HTTP -->
-        <preference name="Scheme" value="https" />
-        <preference name="Hostname" value="localhost" />
+        <!-- Разрешения для клавиатуры -->
+        <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+        <uses-permission android:name="android.permission.RECORD_AUDIO" />
+        <uses-permission android:name="android.permission.VIBRATE" />
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        <uses-permission android:name="android.permission.INTERNET" />
         
         <!-- Настройки WebView -->
         <preference name="AndroidInsecureFileModeEnabled" value="true" />
