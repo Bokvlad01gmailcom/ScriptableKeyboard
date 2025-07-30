@@ -1,0 +1,32 @@
+{
+  "cordova-plugin-whitelist": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-whitelist@1"
+    },
+    "is_top_level": true,
+    "variables": {
+      "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+    }
+  },
+  "cordova-plugin-file": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-file@8"
+    },
+    "is_top_level": true,
+    "variables": {
+      "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+    }
+  },
+  "cordova-plugin-device": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-device@2"
+    },
+    "is_top_level": true,
+    "variables": {
+      "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+    }
+  }
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scriptable Keyboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+        }
+        
+        .button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .floating-button {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #ff6b6b;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .floating-button:hover {
+            transform: scale(1.1);
+            background: #ff5252;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">⌨️</div>
+        <h1>Scriptable Keyboard</h1>
+        <p>Расширяемая клавиатура с системой скриптов</p>
+        
+        <a href="#" class="button" onclick="enableKeyboard()">
+            🔧 Включить клавиатуру в системе
+        </a>
+        
+        <a href="#" class="button" onclick="showFloatingButton()">
+            🎯 Показать плавающую кнопку
+        </a>
+        
+        <a href="#" class="button" onclick="openScriptManager()">
+            📜 Менеджер скриптов
+        </a>
+        
+        <a href="#" class="button" onclick="openSettings()">
+            ⚙️ Настройки
+        </a>
+        
+        <div class="status" id="status">
+            Готов к работе
+        </div>
+    </div>
+    
+    <!-- Плавающая кнопка (скрыта по умолчанию) -->
+    <button class="floating-button" id="floatingBtn" style="display: none;" onclick="toggleKeyboard()">
+        ⌨️
+    </button>
+    
+    <script src="cordova.js"></script>
+    <script src="js/keyboard.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

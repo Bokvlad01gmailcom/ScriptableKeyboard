@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Настройки</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .setting-group {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .setting-label {
+            flex: 1;
+        }
+        
+        .setting-control {
+            margin-left: 20px;
+        }
+        
+        input[type="range"] {
+            width: 150px;
+        }
+        
+        input[type="checkbox"] {
+            transform: scale(1.5);
+        }
+        
+        select, input[type="text"] {
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background: #444;
+            color: white;
+        }
+        
+        .button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status-ok { background: #4CAF50; }
+        .status-error { background: #f44336; }
+        .status-warning { background: #ff9800; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚙️ Настройки</h1>
+        <button class="back-btn" onclick="goBack()">← Назад</button>
+    </div>
+    
+    <!-- Статус системы -->
+    <div class="setting-group">
+        <h3>📊 Статус системы</h3>
+        <div class="setting-item">
+            <span>Разрешение на отображение поверх приложений:</span>
+            <span id="overlayStatus">
+                <span class="status-indicator status-warning"></span>Проверяется...
+            </span>
+        </div>
+        <div class="setting-item">
+            <span>Клавиатура в системе:</span>
+            <span id="keyboardStatus">
+                <span class="status-indicator status-warning"></span>Проверяется...
+            </span>
+        </div>
+        <div class="setting-item">
+            <span>Разрешение на микрофон:</span>
+            <span id="micStatus">
+                <span class="status-indicator status-warning"></span>Проверяется...
+            </span>
+        </div>
+    </div>
+    
+    <!-- Настройки клавиатуры -->
+    <div class="setting-group">
+        <h3>⌨️ Настройки клавиатуры</h3>
+        <div class="setting-item">
+            <span>Размер кнопок:</span>
+            <div class="setting-control">
+                <input type="range" id="buttonSize" min="30" max="80" value="50">
+                <span id="buttonSizeValue">50px</span>
+            </div>
+        </div>
+        <div class="setting-item">
+            <span>Прозрачность:</span>
+            <div class="setting-control">
+                <input type="range" id="transparency" min="0" max="100" value="80">
+                <span id="transparencyValue">80%</span>
+            </div>
+        </div>
+        <div class="setting-item">
+            <span>Вибрация при нажатии:</span>
+            <div class="setting-control">
+                <input type="checkbox" id="vibration" checked>
+            </div>
+        </div>
+        <div class="setting-item">
+            <span>Звук при нажатии:</span>
+            <div class="setting-control">
+                <input type="checkbox" id="sound">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Настройки скриптов -->
+    <div class="setting-group">
+        <h3>📜 Настройки скриптов</h3>
+        <div class="setting-item">
+            <span>Автозагрузка скриптов:</span>
+            <div class="setting-control">
+                <input type="checkbox" id="autoloadScripts" checked>
+            </div>
+        </div>
+        <div class="setting-item">
+            <span>Показывать скрипты в клавиатуре:</span>
+            <div class="setting-control">
+                <input type="checkbox" id="showScriptsInKeyboard" checked>
+            </div>
+        </div>
+        <div class="setting-item">
+            <span>Максимум скриптов в ряду:</span>
+            <div class="setting-control">
+                <select id="maxScriptsInRow">
+                    <option value="3">3</option>
+                    <option value="5" selected>5</option>
+                    <option value="7">7</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Действия -->
+    <div class="setting-group">
+        <h3>🔧 Действия</h3>
+        <button class="button" onclick="requestPermissions()">
+            🔐 Запросить все разрешения
+        </button>
+        <button class="button" onclick="openKeyboardSettings()">
+            ⌨️ Настройки клавиатуры Android
+        </button>
+        <button class="button" onclick="exportSettings()">
+            📤 Экспорт настроек
+        </button>
+        <button class="button" onclick="importSettings()">
+            📥 Импорт настроек
+        </button>
+        <button class="button" onclick="resetSettings()" style="background: rgba(244, 67, 54, 0.3);">
+            🔄 Сбросить настройки
+        </button>
+    </div>
+    
+    <script src="cordova.js"></script>
+    <script src="js/keyboard.js"></script>
+    <script src="js/scripts.js"></script>
+    <script>
+        // Настройки по умолчанию
+        const defaultSettings = {
+            buttonSize: 50,
+            transparency: 80,
+            vibration: true,
+            sound: false,
+            autoloadScripts: true,
+            showScriptsInKeyboard: true,
+            maxScriptsInRow: 5
+        };
+        
+        let currentSettings = {...defaultSettings};
+        
+        document.addEventListener('deviceready', function() {
+            loadSettings();
+            checkSystemStatus();
+            setupEventListeners();
+        }, false);
+        
+        function loadSettings() {
+            const saved = localStorage.getItem('keyboardSettings');
+            if (saved) {
+                try {
+                    currentSettings = {...defaultSettings, ...JSON.parse(saved)};
+                } catch (e) {
+                    console.log('Ошибка загрузки настроек, используем по умолчанию');
+                }
+            }
+            
+            // Применяем настройки к элементам
+            document.getElementById('buttonSize').value = currentSettings.buttonSize;
+            document.getElementById('buttonSizeValue').textContent = currentSettings.buttonSize + 'px';
+            
+            document.getElementById('transparency').value = currentSettings.transparency;
+            document.getElementById('transparencyValue').textContent = currentSettings.transparency + '%';
+            
+            document.getElementById('vibration').checked = currentSettings.vibration;
+            document.getElementById('sound').checked = currentSettings.sound;
+            document.getElementById('autoloadScripts').checked = currentSettings.autoloadScripts;
+            document.getElementById('showScriptsInKeyboard').checked = currentSettings.showScriptsInKeyboard;
+            document.getElementById('maxScriptsInRow').value = currentSettings.maxScriptsInRow;
+        }
+        
+        function saveSettings() {
+            localStorage.setItem('keyboardSettings', JSON.stringify(currentSettings));
+        }
+        
+        function setupEventListeners() {
+            // Размер кнопок
+            document.getElementById('buttonSize').addEventListener('input', function() {
+                currentSettings.buttonSize = parseInt(this.value);
+                document.getElementById('buttonSizeValue').textContent = this.value + 'px';
+                saveSettings();
+            });
+            
+            // Прозрачность
+            document.getElementById('transparency').addEventListener('input', function() {
+                currentSettings.transparency = parseInt(this.value);
+                document.getElementById('transparencyValue').textContent = this.value + '%';
+                saveSettings();
+            });
+            
+            // Остальные настройки
+            ['vibration', 'sound', 'autoloadScripts', 'showScriptsInKeyboard'].forEach(id => {
+                document.getElementById(id).addEventListener('change', function() {
+                    currentSettings[id] = this.checked;
+                    saveSettings();
+                });
+            });
+            
+            document.getElementById('maxScriptsInRow').addEventListener('change', function() {
+                currentSettings.maxScriptsInRow = parseInt(this.value);
+                saveSettings();
+            });
+        }
+        
+        function checkSystemStatus() {
+            // Проверка разрешений (заглушки, в реальном приложении будут нативные проверки)
+            setTimeout(() => {
+                document.getElementById('overlayStatus').innerHTML = 
+                    '<span class="status-indicator status-ok"></span>Разрешено';
+                document.getElementById('keyboardStatus').innerHTML = 
+                    '<span class="status-indicator status-warning"></span>Не активна';
+                document.getElementById('micStatus').innerHTML = 
+                    '<span class="status-indicator status-ok"></span>Разрешено';
+            }, 1000);
+        }
+        
+        function requestPermissions() {
+            alert('Функция запроса разрешений будет реализована в нативном плагине');
+        }
+        
+        function openKeyboardSettings() {
+            try {
+                // Попытка открыть настройки клавиатуры
+                window.open('android-app://com.android.settings/.Settings$InputMethodAndLanguageSettingsActivity', '_system');
+            } catch (e) {
+                alert('Откройте Настройки → Язык и ввод → Клавиатуры');
+            }
+        }
+        
+        function exportSettings() {
+            const data = {
+                settings: currentSettings,
+                scripts: ScriptManager.getAllScripts().filter(s => s.userCreated),
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'keyboard_settings.json';
+            a.click();
+            
+            URL.revokeObjectURL(url);
+        }
+        
+        function importSettings() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            
+                            if (data.settings) {
+                                currentSettings = {...defaultSettings, ...data.settings};
+                                saveSettings();
+                                loadSettings();
+                            }
+                            
+                            if (data.scripts) {
+                                data.scripts.forEach(script => {
+                                    ScriptManager.addScript(script);
+                                });
+                                ScriptManager.saveUserScripts();
+                            }
+                            
+                            alert('Настройки импортированы успешно!');
+                        } catch (e) {
+                            alert('Ошибка импорта: ' + e.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            
+            input.click();
+        }
+        
+        function resetSettings() {
+            if (confirm('Сбросить все настройки к значениям по умолчанию?')) {
+                currentSettings = {...defaultSettings};
+                saveSettings();
+                loadSettings();
+                alert('Настройки сброшены');
+            }
+        }
+        
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
+        // Получить текущие настройки (для использования в других модулях)
+        window.getKeyboardSettings = function() {
+            return currentSettings;
+        };
+    </script>
+</body>
+</html>

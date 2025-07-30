@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.scriptable.keyboard" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>ScriptableKeyboard</name>
+    <description>Расширяемая клавиатура с системой скриптов</description>
+    <author email="dev@example.com" href="https://example.com">Developer</author>
+    
+    <content src="index.html" />
+    
+    <!-- Разрешения для клавиатуры -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Настройки Android -->
+    <platform name="android">
+        <allow-intent href="market:*" />
+        
+        <!-- Минимальная версия Android -->
+        <preference name="android-minSdkVersion" value="21" />
+        <preference name="android-targetSdkVersion" value="33" />
+        
+        <!-- Разрешить HTTP -->
+        <preference name="Scheme" value="https" />
+        <preference name="Hostname" value="localhost" />
+        
+        <!-- Настройки WebView -->
+        <preference name="AndroidInsecureFileModeEnabled" value="true" />
+        
+        <!-- КЛЮЧЕВОЕ: Добавляем InputMethodService -->
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <service android:name="com.scriptable.keyboard.KeyboardService"
+                android:permission="android.permission.BIND_INPUT_METHOD"
+                android:exported="true">
+                <intent-filter>
+                    <action android:name="android.view.InputMethod" />
+                </intent-filter>
+                <meta-data android:name="android.view.im"
+                    android:resource="@xml/method" />
+            </service>
+        </config-file>
+        
+        <!-- Добавляем разрешения в манифест -->
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+            <uses-permission android:name="android.permission.RECORD_AUDIO" />
+            <uses-permission android:name="android.permission.VIBRATE" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        </config-file>
+    </platform>
+    
+    <!-- Плагины -->
+    <plugin name="cordova-plugin-whitelist" spec="1" />
+    <plugin name="cordova-plugin-file" spec="8" />
+    <plugin name="cordova-plugin-device" spec="2" />
+</widget>

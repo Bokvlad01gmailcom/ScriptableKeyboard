@@ -1,0 +1,23 @@
+{
+  "name": "cordova-plugin-keyboard-native",
+  "version": "1.0.0",
+  "description": "Native keyboard functionality for ScriptableKeyboard",
+  "main": "www/KeyboardPlugin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cordova",
+    "keyboard",
+    "inputmethod",
+    "android"
+  ],
+  "author": "ScriptableKeyboard",
+  "license": "MIT",
+  "cordova": {
+    "id": "cordova-plugin-keyboard-native",
+    "platforms": [
+      "android"
+    ]
+  }
+}

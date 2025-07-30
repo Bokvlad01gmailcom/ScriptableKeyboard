@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-keyboard-native"
+        version="1.0.0">
+    
+    <name>Keyboard Native Plugin</name>
+    <description>Native keyboard functionality for ScriptableKeyboard</description>
+    <license>MIT</license>
+    
+    <js-module src="www/KeyboardPlugin.js" name="KeyboardPlugin">
+        <clobbers target="KeyboardPlugin" />
+    </js-module>
+    
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="KeyboardPlugin">
+                <param name="android-package" value="com.scriptable.keyboard.KeyboardPlugin"/>
+            </feature>
+        </config-file>
+        
+        <source-file src="src/android/KeyboardPlugin.java" 
+                     target-dir="src/com/scriptable/keyboard" />
+    </platform>
+</plugin>

@@ -1,0 +1,24 @@
+# Node modules
+node_modules/
+npm-debug.log*
+
+# Cordova
+platforms/
+plugins/cordova-plugin-whitelist/
+plugins/cordova-plugin-file/
+plugins/cordova-plugin-device/
+
+# Build outputs
+*.apk
+*.aab
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
