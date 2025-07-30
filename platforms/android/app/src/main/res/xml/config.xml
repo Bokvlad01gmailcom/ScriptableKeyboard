@@ -1,5 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.scriptable.keyboard" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <feature name="KeyboardPlugin">
+        <param name="android-package" value="com.scriptable.keyboard.KeyboardPlugin" />
+    </feature>
     <feature name="File">
         <param name="android-package" value="org.apache.cordova.file.FileUtils" />
         <param name="onload" value="true" />
@@ -12,32 +15,8 @@
     <description>Расширяемая клавиатура с системой скриптов</description>
     <author email="dev@example.com" href="https://example.com">Developer</author>
     <content src="index.html" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <allow-intent href="market:*" />
-    <config-file parent="/manifest/application" target="AndroidManifest.xml">
-        <service android:exported="true" android:name="com.scriptable.keyboard.KeyboardService" android:permission="android.permission.BIND_INPUT_METHOD">
-            <intent-filter>
-                <action android:name="android.view.InputMethod" />
-            </intent-filter>
-            <meta-data android:name="android.view.im" android:resource="@xml/method" />
-        </service>
-    </config-file>
-    <config-file parent="/manifest" target="AndroidManifest.xml">
-        <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-        <uses-permission android:name="android.permission.RECORD_AUDIO" />
-        <uses-permission android:name="android.permission.VIBRATE" />
-        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    </config-file>
     <preference name="loglevel" value="DEBUG" />
     <preference name="android-minSdkVersion" value="21" />
-    <preference name="android-targetSdkVersion" value="33" />
-    <preference name="Scheme" value="https" />
-    <preference name="Hostname" value="localhost" />
-    <preference name="AndroidInsecureFileModeEnabled" value="true" />
+    <preference name="android-targetSdkVersion" value="34" />
+    <preference name="android-compileSdkVersion" value="34" />
 </widget>

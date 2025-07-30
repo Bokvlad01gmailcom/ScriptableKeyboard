@@ -1,6 +1,14 @@
 cordova.define('cordova/plugin_list', function(require, exports, module) {
   module.exports = [
     {
+      "id": "cordova-plugin-keyboard-native.KeyboardPlugin",
+      "file": "plugins/cordova-plugin-keyboard-native/www/KeyboardPlugin.js",
+      "pluginId": "cordova-plugin-keyboard-native",
+      "clobbers": [
+        "KeyboardPlugin"
+      ]
+    },
+    {
       "id": "cordova-plugin-file.DirectoryEntry",
       "file": "plugins/cordova-plugin-file/www/DirectoryEntry.js",
       "pluginId": "cordova-plugin-file",
@@ -191,6 +199,7 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
     }
   ];
   module.exports.metadata = {
+    "cordova-plugin-keyboard-native": "1.0.0",
     "cordova-plugin-file": "8.1.3",
     "cordova-plugin-device": "2.1.0"
   };

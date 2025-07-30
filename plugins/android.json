@@ -15,5 +15,9 @@
       "PACKAGE_NAME": "com.scriptable.keyboard"
     }
   },
-  "dependent_plugins": {}
+  "dependent_plugins": {
+    "cordova-plugin-keyboard-native": {
+      "PACKAGE_NAME": "com.scriptable.keyboard"
+    }
+  }
 }
