@@ -5,11 +5,15 @@ const KeyboardManager = {
     
     // Показать клавиатуру
     show() {
-        if (this.isVisible) return;
+        Debug.info('=== KEYBOARD SHOW ===');
+        if (this.isVisible) {
+            Debug.warn('Keyboard already visible');
+            return;
+        }
         
         this.createKeyboard();
         this.isVisible = true;
-        console.log('Клавиатура показана');
+        Debug.info('Клавиатура показана');
     },
     
     // Скрыть клавиатуру
@@ -105,6 +109,8 @@ const KeyboardManager = {
         const action = keyData.action || 'type';
         const value = keyData.value || keyData.text || keyData;
         
+        Debug.info('Key pressed', { action, value });
+        
         switch (action) {
             case 'type':
                 this.typeText(value);
@@ -144,20 +150,24 @@ const KeyboardManager = {
     
     // Нативный ввод текста
     typeTextNative(text) {
+        Debug.info('Trying native text input', text);
         try {
-            cordova.exec(
-                function(success) {
-                    console.log('Текст введен:', text);
-                },
-                function(error) {
-                    console.log('Ошибка ввода, используем буфер обмена');
-                    KeyboardManager.typeTextClipboard(text);
-                },
-                'KeyboardPlugin',
-                'typeText',
-                [text]
-            );
+            if (typeof KeyboardPlugin !== 'undefined') {
+                KeyboardPlugin.typeText(text,
+                    function(success) {
+                        Debug.info('Native text input success', success);
+                    },
+                    function(error) {
+                        Debug.warn('Native text input failed, using clipboard', error);
+                        KeyboardManager.typeTextClipboard(text);
+                    }
+                );
+            } else {
+                Debug.warn('KeyboardPlugin not available, using clipboard');
+                this.typeTextClipboard(text);
+            }
         } catch (e) {
+            Debug.error('Exception in native text input', e);
             this.typeTextClipboard(text);
         }
     },
