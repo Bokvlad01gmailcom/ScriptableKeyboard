@@ -166,6 +166,10 @@ const WebServer = {
             if (event.source === debugWindow) {
                 if (event.data.type === 'command') {
                     this.executeRemoteCommand(event.data.command, debugWindow);
+                } else if (event.data.type === 'installScript') {
+                    this.handleScriptInstallation(event.data.script, debugWindow);
+                } else if (event.data.type === 'getScripts') {
+                    this.sendScriptsList(debugWindow);
                 }
             }
         });
@@ -206,6 +210,32 @@ const WebServer = {
                     success: false
                 }, '*');
             }
+        }
+    },
+    
+    // Обработка установки скрипта
+    handleScriptInstallation(scriptData, targetWindow) {
+        Debug.info('Installing script from web interface', scriptData.name);
+        
+        const result = ScriptInstaller.installFromWeb(scriptData);
+        
+        if (targetWindow && !targetWindow.closed) {
+            targetWindow.postMessage({
+                type: 'scriptInstallResult',
+                result: result
+            }, '*');
+        }
+    },
+    
+    // Отправка списка скриптов
+    sendScriptsList(targetWindow) {
+        const scripts = ScriptInstaller.getInstalledScripts();
+        
+        if (targetWindow && !targetWindow.closed) {
+            targetWindow.postMessage({
+                type: 'scriptsList',
+                scripts: scripts
+            }, '*');
         }
     },
     
@@ -250,6 +280,7 @@ const WebServer = {
         <button onclick="sendCommand('KeyboardManager.show()')">⌨️ Show Keyboard</button>
         <button onclick="sendCommand('Debug.clearLogs()')">🧹 Clear Logs</button>
         <button onclick="refreshLogs()">🔄 Refresh</button>
+        <button onclick="showScriptManager()">📜 Scripts</button>
         
         <div style="margin-top: 15px;">
             <input type="text" class="command-input" id="commandInput" placeholder="Введите JavaScript команду для выполнения в приложении..." onkeypress="if(event.key==='Enter') executeCommand()">
@@ -259,6 +290,38 @@ const WebServer = {
     
     <div class="log-container" id="logs">
         <div class="debug">🔄 Ожидание логов от приложения...</div>
+    </div>
+    
+    <!-- Script Manager Modal -->
+    <div id="scriptManager" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000;">
+        <div style="background: #111; margin: 50px auto; padding: 20px; border-radius: 10px; max-width: 800px; max-height: 80%; overflow-y: auto; border: 2px solid #0f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>📜 Script Manager</h2>
+                <button onclick="closeScriptManager()" style="background: #f44; color: #fff;">✕ Close</button>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3>📥 Install New Script</h3>
+                <div style="background: #222; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
+                    <input type="text" id="scriptName" placeholder="Script Name" style="width: 100%; margin-bottom: 10px; padding: 8px; background: #333; color: #0f0; border: 1px solid #555;">
+                    <input type="text" id="scriptIcon" placeholder="Icon (emoji)" style="width: 100px; margin-bottom: 10px; padding: 8px; background: #333; color: #0f0; border: 1px solid #555;">
+                    <input type="text" id="scriptDescription" placeholder="Description" style="width: 100%; margin-bottom: 10px; padding: 8px; background: #333; color: #0f0; border: 1px solid #555;">
+                    <textarea id="scriptCode" placeholder="JavaScript code..." style="width: 100%; height: 150px; padding: 8px; background: #333; color: #0f0; border: 1px solid #555; font-family: monospace;"></textarea>
+                    <div style="margin-top: 10px;">
+                        <button onclick="installScript()">📥 Install Script</button>
+                        <button onclick="loadExampleScript()">📋 Load Example</button>
+                        <button onclick="testScript()">🧪 Test Script</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h3>📋 Installed Scripts</h3>
+                <div id="installedScripts">
+                    <div style="color: #888;">Loading scripts...</div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -357,6 +420,111 @@ const WebServer = {
                 document.getElementById('status').innerHTML = '⚠️ Убедитесь что приложение ScriptableKeyboard запущено';
             }
         }, 5000);
+        
+        // Script Manager functions
+        function showScriptManager() {
+            document.getElementById('scriptManager').style.display = 'block';
+            loadInstalledScripts();
+        }
+        
+        function closeScriptManager() {
+            document.getElementById('scriptManager').style.display = 'none';
+        }
+        
+        function installScript() {
+            const name = document.getElementById('scriptName').value.trim();
+            const icon = document.getElementById('scriptIcon').value.trim() || '📜';
+            const description = document.getElementById('scriptDescription').value.trim();
+            const code = document.getElementById('scriptCode').value.trim();
+            
+            if (!name || !code) {
+                alert('Name and code are required!');
+                return;
+            }
+            
+            const scriptData = { name, icon, description, code };
+            
+            if (window.opener) {
+                window.opener.postMessage({type: 'installScript', script: scriptData}, '*');
+            }
+        }
+        
+        function loadExampleScript() {
+            document.getElementById('scriptName').value = 'Current Time';
+            document.getElementById('scriptIcon').value = '🕐';
+            document.getElementById('scriptDescription').value = 'Insert current time';
+            document.getElementById('scriptCode').value = \`const now = new Date();
+const timeString = now.toLocaleTimeString('ru-RU');
+KeyboardManager.typeText(timeString);
+KeyboardManager.showNotification('Time inserted: ' + timeString);\`;
+        }
+        
+        function testScript() {
+            const code = document.getElementById('scriptCode').value.trim();
+            if (code) {
+                sendCommand(code);
+            }
+        }
+        
+        function loadInstalledScripts() {
+            if (window.opener) {
+                window.opener.postMessage({type: 'getScripts'}, '*');
+            }
+        }
+        
+        // Handle script installation result
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'scriptInstallResult') {
+                const result = event.data.result;
+                if (result.success) {
+                    alert('Script installed successfully!');
+                    document.getElementById('scriptName').value = '';
+                    document.getElementById('scriptIcon').value = '';
+                    document.getElementById('scriptDescription').value = '';
+                    document.getElementById('scriptCode').value = '';
+                    loadInstalledScripts();
+                } else {
+                    alert('Installation failed: ' + result.error);
+                }
+            } else if (event.data.type === 'scriptsList') {
+                displayInstalledScripts(event.data.scripts);
+            }
+        });
+        
+        function displayInstalledScripts(scripts) {
+            const container = document.getElementById('installedScripts');
+            if (scripts.length === 0) {
+                container.innerHTML = '<div style="color: #888;">No scripts installed</div>';
+                return;
+            }
+            
+            container.innerHTML = scripts.map(script => \`
+                <div style="background: #222; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #0f0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="font-size: 18px;">\${script.icon}</span>
+                            <strong>\${script.name}</strong>
+                            <div style="color: #888; font-size: 12px;">\${script.description}</div>
+                        </div>
+                        <div>
+                            <button onclick="executeScript('\${script.id}')" style="background: #0a0; color: #fff; border: none; padding: 5px 10px; margin: 2px; border-radius: 3px;">▶️ Run</button>
+                            \${script.userCreated ? \`<button onclick="deleteScript('\${script.id}')" style="background: #a00; color: #fff; border: none; padding: 5px 10px; margin: 2px; border-radius: 3px;">🗑️ Delete</button>\` : ''}
+                        </div>
+                    </div>
+                </div>
+            \`).join('');
+        }
+        
+        function executeScript(scriptId) {
+            sendCommand(\`ScriptManager.executeScript('\${scriptId}')\`);
+        }
+        
+        function deleteScript(scriptId) {
+            if (confirm('Delete this script?')) {
+                sendCommand(\`ScriptInstaller.uninstallScript('\${scriptId}')\`);
+                setTimeout(loadInstalledScripts, 500);
+            }
+        }
     </script>
 </body>
 </html>`;
