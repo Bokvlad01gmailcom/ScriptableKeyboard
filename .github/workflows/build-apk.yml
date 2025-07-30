@@ -38,24 +38,21 @@ jobs:
         
     - name: Install dependencies
       run: |
-        cd ScriptableKeyboard
         npm install
         
     - name: Add Android platform
       run: |
-        cd ScriptableKeyboard
         cordova platform add android
         
     - name: Build APK
       run: |
-        cd ScriptableKeyboard
         cordova build android --debug
         
     - name: Upload APK
       uses: actions/upload-artifact@v3
       with:
         name: ScriptableKeyboard-APK
-        path: ScriptableKeyboard/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
         
     - name: Create Release
       if: github.ref == 'refs/heads/main'
@@ -63,7 +60,7 @@ jobs:
       with:
         tag_name: v1.0.${{ github.run_number }}
         name: ScriptableKeyboard v1.0.${{ github.run_number }}
-        files: ScriptableKeyboard/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        files: platforms/android/app/build/outputs/apk/debug/app-debug.apk
         draft: false
         prerelease: false
       env:
