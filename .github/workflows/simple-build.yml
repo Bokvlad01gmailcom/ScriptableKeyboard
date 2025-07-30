@@ -1,0 +1,71 @@
+name: Simple APK Build
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 34
+        
+    - name: Install Cordova
+      run: npm install -g cordova@latest
+        
+    - name: Debug - List files
+      run: |
+        echo "=== Root directory ==="
+        ls -la
+        echo "=== Config.xml exists? ==="
+        test -f config.xml && echo "YES" || echo "NO"
+        
+    - name: Install dependencies
+      run: |
+        if [ -f package.json ]; then
+          npm install
+        else
+          echo "No package.json found, skipping npm install"
+        fi
+        
+    - name: Prepare Cordova
+      run: |
+        cordova prepare android || echo "Prepare failed, continuing..."
+        
+    - name: Build APK
+      run: |
+        cordova build android --debug --verbose
+        
+    - name: Find APK files
+      run: |
+        echo "=== Looking for APK files ==="
+        find . -name "*.apk" -type f
+        
+    - name: Upload APK
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ScriptableKeyboard-APK
+        path: |
+          platforms/android/app/build/outputs/apk/debug/*.apk
+          platforms/android/app/build/outputs/apk/**/*.apk
+        retention-days: 30
