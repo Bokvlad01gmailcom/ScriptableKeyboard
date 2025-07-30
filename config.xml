@@ -6,33 +6,11 @@
     
     <content src="index.html" />
     
-    
-    <!-- Настройки Android -->
     <platform name="android">
-        <allow-intent href="market:*" />
-        
-        <!-- Минимальная версия Android -->
         <preference name="android-minSdkVersion" value="21" />
         <preference name="android-targetSdkVersion" value="34" />
         <preference name="android-compileSdkVersion" value="34" />
-        
-        <!-- Разрешения для клавиатуры -->
-        <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-            <uses-permission android:name="android.permission.RECORD_AUDIO" />
-            <uses-permission android:name="android.permission.VIBRATE" />
-            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-            <uses-permission android:name="android.permission.INTERNET" />
-        </config-file>
-        
-        <!-- Настройки WebView -->
-        <preference name="AndroidInsecureFileModeEnabled" value="true" />
-        
     </platform>
     
-    <!-- Плагины -->
     <plugin name="cordova-plugin-whitelist" spec="1" />
-    <plugin name="cordova-plugin-file" spec="8" />
-    <plugin name="cordova-plugin-device" spec="2" />
 </widget>
