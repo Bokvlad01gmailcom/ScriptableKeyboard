@@ -39,14 +39,14 @@ public class KeyboardService extends InputMethodService {
     
     private void launchMainApp() {
         try {
-            Log.d(TAG, "Launching main app with floating button");
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.putExtra("show_floating", true);
-            intent.putExtra("auto_show_button", true);
-            startActivity(intent);
+            Log.d(TAG, "Starting floating button service instead of main app");
+            
+            // Вместо запуска MainActivity, запускаем сервис плавающей кнопки
+            Intent serviceIntent = new Intent(this, FloatingButtonService.class);
+            startService(serviceIntent);
+            
         } catch (Exception e) {
-            Log.e(TAG, "Error launching main app", e);
+            Log.e(TAG, "Error starting floating button service", e);
         }
     }
     
