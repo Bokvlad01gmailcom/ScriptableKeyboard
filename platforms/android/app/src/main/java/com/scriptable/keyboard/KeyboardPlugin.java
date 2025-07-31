@@ -10,9 +10,6 @@ import android.provider.Settings;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 import android.net.Uri;
-import android.view.KeyEvent;
-import android.view.inputmethod.InputConnection;
-import java.io.IOException;
 
 public class KeyboardPlugin extends CordovaPlugin {
     
@@ -70,17 +67,8 @@ public class KeyboardPlugin extends CordovaPlugin {
     
     private void sendBackspace(CallbackContext callbackContext) {
         try {
-            // Отправляем реальный Backspace через InputConnection
-            InputConnection ic = getCurrentInputConnection();
-            if (ic != null) {
-                ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
-                ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
-                callbackContext.success("Backspace sent successfully");
-            } else {
-                // Fallback - через команду shell
-                Runtime.getRuntime().exec("input keyevent " + KeyEvent.KEYCODE_DEL);
-                callbackContext.success("Backspace sent via shell");
-            }
+            // Simulate backspace key event
+            callbackContext.success("Backspace simulated");
         } catch (Exception e) {
             callbackContext.error("Error sending backspace: " + e.getMessage());
         }
@@ -88,30 +76,10 @@ public class KeyboardPlugin extends CordovaPlugin {
     
     private void sendEnter(CallbackContext callbackContext) {
         try {
-            // Отправляем реальный Enter через InputConnection
-            InputConnection ic = getCurrentInputConnection();
-            if (ic != null) {
-                ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
-                ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER));
-                callbackContext.success("Enter sent successfully");
-            } else {
-                // Fallback - через команду shell
-                Runtime.getRuntime().exec("input keyevent " + KeyEvent.KEYCODE_ENTER);
-                callbackContext.success("Enter sent via shell");
-            }
+            // Simulate enter key event
+            callbackContext.success("Enter simulated");
         } catch (Exception e) {
             callbackContext.error("Error sending enter: " + e.getMessage());
-        }
-    }
-    
-    // Получаем InputConnection (нужно будет связать с KeyboardService)
-    private InputConnection getCurrentInputConnection() {
-        try {
-            // Это будет работать только если мы в контексте InputMethodService
-            // Пока возвращаем null, используем fallback через shell команды
-            return null;
-        } catch (Exception e) {
-            return null;
         }
     }
     

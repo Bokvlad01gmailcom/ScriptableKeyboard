@@ -85,20 +85,8 @@
         <h1>Scriptable Keyboard</h1>
         <p>Расширяемая клавиатура с системой скриптов</p>
         
-        <a href="#" class="button" onclick="enableKeyboard()">
-            🔧 Включить клавиатуру в системе
-        </a>
-        
-        <a href="#" class="button" onclick="showFloatingButton()">
-            🎯 Показать плавающую кнопку
-        </a>
-        
-        <a href="#" class="button" onclick="openScriptManager()">
-            📜 Менеджер скриптов
-        </a>
-        
-        <a href="#" class="button" onclick="openSettings()">
-            ⚙️ Настройки
+        <a href="#" class="button" onclick="toggleDebug()" id="debugToggle">
+            🐛
         </a>
         
         <div class="status" id="status">
@@ -112,6 +100,8 @@
     </button>
     
     <script src="cordova.js"></script>
+    <script src="js/debug.js"></script>
+    <script src="js/termux-debug.js"></script>
     <script src="js/keyboard.js"></script>
     <script src="js/scripts.js"></script>
     <script src="js/app.js"></script>
