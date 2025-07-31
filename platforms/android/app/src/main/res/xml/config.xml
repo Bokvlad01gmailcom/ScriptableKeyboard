@@ -15,6 +15,16 @@
     <description>Расширяемая клавиатура с системой скриптов</description>
     <author email="dev@example.com" href="https://example.com">Developer</author>
     <content src="index.html" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <service android:exported="true" android:name="com.scriptable.keyboard.KeyboardService" android:permission="android.permission.BIND_INPUT_METHOD">
+        <intent-filter>
+            <action android:name="android.view.InputMethod" />
+        </intent-filter>
+        <meta-data android:name="android.view.im" android:resource="@xml/method" />
+    </service>
+    <resource-file src="platforms/android/app/src/main/res/xml/method.xml" target="res/xml/method.xml" />
     <preference name="loglevel" value="DEBUG" />
     <preference name="android-minSdkVersion" value="21" />
     <preference name="android-targetSdkVersion" value="35" />
