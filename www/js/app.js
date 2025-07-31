@@ -18,13 +18,63 @@ function onDeviceReady() {
     // Инициализируем систему скриптов
     ScriptManager.init();
     
-    // Автозапуск удаленной отладки
+    // Проверяем Intent - запущено ли из клавиатуры
+    checkLaunchIntent();
+    
+    // Автозапуск плавающей кнопки
     setTimeout(() => {
-        RemoteDebug.start();
-        WebServer.start();
-    }, 2000);
+        forceShowFloatingButton();
+    }, 1000);
     
     Debug.info('App initialization completed');
+}
+
+// Проверка Intent запуска
+function checkLaunchIntent() {
+    try {
+        if (typeof cordova !== 'undefined' && cordova.plugins && cordova.plugins.intent) {
+            cordova.plugins.intent.getIntent((intent) => {
+                Debug.info('Launch intent', intent);
+                if (intent.extras && intent.extras.show_floating) {
+                    Debug.info('Launched from keyboard service - showing floating button');
+                    setTimeout(() => forceShowFloatingButton(), 500);
+                }
+            });
+        }
+    } catch (e) {
+        Debug.warn('Intent check failed', e.message);
+    }
+}
+
+// Принудительный показ плавающей кнопки
+function forceShowFloatingButton() {
+    Debug.info('=== FORCE SHOW FLOATING BUTTON ===');
+    
+    // Проверяем разрешение overlay
+    if (typeof cordova !== 'undefined' && cordova.plugins && cordova.plugins.permissions) {
+        cordova.plugins.permissions.checkPermission('android.permission.SYSTEM_ALERT_WINDOW', 
+            (status) => {
+                if (status.hasPermission) {
+                    Debug.info('Overlay permission granted - showing button');
+                    showFloatingButton();
+                    
+                    // Дополнительная проверка через 2 секунды
+                    setTimeout(() => {
+                        if (!floatingButtonVisible) {
+                            Debug.warn('Button still not visible - forcing again');
+                            showFloatingButton();
+                        }
+                    }, 2000);
+                } else {
+                    Debug.error('No overlay permission - requesting');
+                    requestOverlayPermission();
+                }
+            }
+        );
+    } else {
+        // Показываем без проверки
+        showFloatingButton();
+    }
 }
 
 function updateStatus(message) {

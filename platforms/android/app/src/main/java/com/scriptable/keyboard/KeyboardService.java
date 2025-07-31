@@ -39,10 +39,11 @@ public class KeyboardService extends InputMethodService {
     
     private void launchMainApp() {
         try {
-            Log.d(TAG, "Launching main app");
+            Log.d(TAG, "Launching main app with floating button");
             Intent intent = new Intent(this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.putExtra("show_floating", true);
+            intent.putExtra("auto_show_button", true);
             startActivity(intent);
         } catch (Exception e) {
             Log.e(TAG, "Error launching main app", e);

@@ -105,8 +105,8 @@
             🐛 Debug Console
         </a>
         
-        <a href="#" class="button" onclick="RemoteDebug.start()" style="background: rgba(0,255,0,0.3);">
-            🌐 Remote Debug
+        <a href="#" class="button" onclick="sendLogsToTermux()" style="background: rgba(0,255,255,0.3);">
+            📤 Send Logs to Termux
         </a>
         
         <div class="status" id="status">
@@ -121,9 +121,7 @@
     
     <script src="cordova.js"></script>
     <script src="js/debug.js"></script>
-    <script src="js/remote-debug.js"></script>
-    <script src="js/web-server.js"></script>
-    <script src="js/script-installer.js"></script>
+    <script src="js/termux-debug.js"></script>
     <script src="js/keyboard.js"></script>
     <script src="js/scripts.js"></script>
     <script src="js/app.js"></script>
