@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.scriptable.keyboard" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>ScriptableKeyboard</name>
+    <description>Расширяемая клавиатура с системой скриптов</description>
+    <author email="dev@example.com" href="https://example.com">Developer</author>
+    
+    <content src="index.html" />
+    
+    <platform name="android">
+        <preference name="android-minSdkVersion" value="21" />
+        <preference name="android-targetSdkVersion" value="35" />
+        <preference name="android-compileSdkVersion" value="35" />
+    </platform>
+    
+    <plugin name="cordova-plugin-whitelist" spec="1" />
+</widget>
