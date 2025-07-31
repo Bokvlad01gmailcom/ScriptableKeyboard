@@ -10,10 +10,14 @@ import android.provider.Settings;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 import android.net.Uri;
+import android.view.KeyEvent;
+import android.app.Instrumentation;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 public class KeyboardPlugin extends CordovaPlugin {
     
-    // Removed KeyboardService dependency for now - will implement direct input methods
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
     
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -66,21 +70,35 @@ public class KeyboardPlugin extends CordovaPlugin {
     }
     
     private void sendBackspace(CallbackContext callbackContext) {
-        try {
-            // Simulate backspace key event
-            callbackContext.success("Backspace simulated");
-        } catch (Exception e) {
-            callbackContext.error("Error sending backspace: " + e.getMessage());
-        }
+        executor.execute(() -> {
+            try {
+                Instrumentation instrumentation = new Instrumentation();
+                instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_DEL);
+                cordova.getActivity().runOnUiThread(() -> {
+                    callbackContext.success("Backspace sent");
+                });
+            } catch (Exception e) {
+                cordova.getActivity().runOnUiThread(() -> {
+                    callbackContext.error("Error sending backspace: " + e.getMessage());
+                });
+            }
+        });
     }
     
     private void sendEnter(CallbackContext callbackContext) {
-        try {
-            // Simulate enter key event
-            callbackContext.success("Enter simulated");
-        } catch (Exception e) {
-            callbackContext.error("Error sending enter: " + e.getMessage());
-        }
+        executor.execute(() -> {
+            try {
+                Instrumentation instrumentation = new Instrumentation();
+                instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_ENTER);
+                cordova.getActivity().runOnUiThread(() -> {
+                    callbackContext.success("Enter sent");
+                });
+            } catch (Exception e) {
+                cordova.getActivity().runOnUiThread(() -> {
+                    callbackContext.error("Error sending enter: " + e.getMessage());
+                });
+            }
+        });
     }
     
     private void openKeyboardSettings(CallbackContext callbackContext) {

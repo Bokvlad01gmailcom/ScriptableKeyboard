@@ -185,19 +185,49 @@ const KeyboardManager = {
     
     // Отправка Backspace
     sendBackspace() {
+        Debug.info('Sending backspace');
         try {
-            cordova.exec(null, null, 'KeyboardPlugin', 'sendBackspace', []);
+            if (typeof KeyboardPlugin !== 'undefined') {
+                KeyboardPlugin.sendBackspace(
+                    function(success) {
+                        Debug.info('Backspace sent successfully', success);
+                    },
+                    function(error) {
+                        Debug.error('Backspace failed', error);
+                        KeyboardManager.showNotification('Backspace недоступен');
+                    }
+                );
+            } else {
+                Debug.warn('KeyboardPlugin not available for backspace');
+                this.showNotification('Backspace недоступен');
+            }
         } catch (e) {
-            console.log('Backspace недоступен');
+            Debug.error('Exception sending backspace', e);
+            this.showNotification('Ошибка backspace: ' + e.message);
         }
     },
     
     // Отправка Enter
     sendEnter() {
+        Debug.info('Sending enter');
         try {
-            cordova.exec(null, null, 'KeyboardPlugin', 'sendEnter', []);
+            if (typeof KeyboardPlugin !== 'undefined') {
+                KeyboardPlugin.sendEnter(
+                    function(success) {
+                        Debug.info('Enter sent successfully', success);
+                    },
+                    function(error) {
+                        Debug.error('Enter failed', error);
+                        KeyboardManager.showNotification('Enter недоступен');
+                    }
+                );
+            } else {
+                Debug.warn('KeyboardPlugin not available for enter');
+                this.showNotification('Enter недоступен');
+            }
         } catch (e) {
-            console.log('Enter недоступен');
+            Debug.error('Exception sending enter', e);
+            this.showNotification('Ошибка enter: ' + e.message);
         }
     },
     

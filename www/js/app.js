@@ -213,12 +213,17 @@ function makeButtonDraggable(element) {
         hasMoved = false;
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
-        initialX = element.offsetLeft;
-        initialY = element.offsetTop;
         
-        // Убираем призрак - очищаем исходную позицию
-        element.style.right = 'auto';
-        element.style.bottom = 'auto';
+        // Получаем текущую позицию элемента
+        const rect = element.getBoundingClientRect();
+        initialX = rect.left;
+        initialY = rect.top;
+        
+        // Полностью убираем исходные стили позиционирования
+        element.style.right = '';
+        element.style.bottom = '';
+        element.style.left = initialX + 'px';
+        element.style.top = initialY + 'px';
         
         e.preventDefault();
     });
@@ -237,12 +242,15 @@ function makeButtonDraggable(element) {
             hasMoved = true;
             
             // Устанавливаем новую позицию
-            element.style.left = (initialX + deltaX) + 'px';
-            element.style.top = (initialY + deltaY) + 'px';
+            const newX = initialX + deltaX;
+            const newY = initialY + deltaY;
             
-            // Убираем стили исходной позиции чтобы избежать призрака
-            element.style.right = 'unset';
-            element.style.bottom = 'unset';
+            // Ограничиваем позицию границами экрана
+            const maxX = window.innerWidth - element.offsetWidth;
+            const maxY = window.innerHeight - element.offsetHeight;
+            
+            element.style.left = Math.max(0, Math.min(newX, maxX)) + 'px';
+            element.style.top = Math.max(0, Math.min(newY, maxY)) + 'px';
         }
         
         e.preventDefault();
