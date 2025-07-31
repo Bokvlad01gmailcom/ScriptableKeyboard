@@ -205,13 +205,21 @@ function openSettings() {
 function makeButtonDraggable(element) {
     let isDragging = false;
     let startX, startY, initialX, initialY;
+    let dragThreshold = 10; // Минимальное расстояние для начала перетаскивания
+    let hasMoved = false;
     
     element.addEventListener('touchstart', function(e) {
         isDragging = true;
+        hasMoved = false;
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
         initialX = element.offsetLeft;
         initialY = element.offsetTop;
+        
+        // Убираем призрак - очищаем исходную позицию
+        element.style.right = 'auto';
+        element.style.bottom = 'auto';
+        
         e.preventDefault();
     });
     
@@ -224,15 +232,38 @@ function makeButtonDraggable(element) {
         const deltaX = currentX - startX;
         const deltaY = currentY - startY;
         
-        element.style.left = (initialX + deltaX) + 'px';
-        element.style.top = (initialY + deltaY) + 'px';
-        element.style.right = 'auto';
+        // Проверяем, превышен ли порог перетаскивания
+        if (Math.abs(deltaX) > dragThreshold || Math.abs(deltaY) > dragThreshold) {
+            hasMoved = true;
+            
+            // Устанавливаем новую позицию
+            element.style.left = (initialX + deltaX) + 'px';
+            element.style.top = (initialY + deltaY) + 'px';
+            
+            // Убираем стили исходной позиции чтобы избежать призрака
+            element.style.right = 'unset';
+            element.style.bottom = 'unset';
+        }
         
         e.preventDefault();
     });
     
     element.addEventListener('touchend', function(e) {
         isDragging = false;
+        
+        // Если кнопка не была перемещена, обрабатываем как клик
+        if (!hasMoved) {
+            // Позволяем обработчику клика сработать
+            return;
+        }
+        
+        // Сохраняем новую позицию
+        const rect = element.getBoundingClientRect();
+        element.style.left = rect.left + 'px';
+        element.style.top = rect.top + 'px';
+        
+        e.preventDefault();
+        e.stopPropagation();
     });
 }
 
