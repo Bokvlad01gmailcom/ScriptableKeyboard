@@ -10,6 +10,14 @@ import android.util.Log;
 public class KeyboardService extends InputMethodService {
     
     private static final String TAG = "ScriptableKeyboard";
+    private static KeyboardService instance;
+    
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        instance = this;
+        Log.d(TAG, "KeyboardService created");
+    }
     
     @Override
     public View onCreateInputView() {
@@ -23,6 +31,10 @@ public class KeyboardService extends InputMethodService {
         launchMainApp();
         
         return view;
+    }
+    
+    public static KeyboardService getInstance() {
+        return instance;
     }
     
     @Override

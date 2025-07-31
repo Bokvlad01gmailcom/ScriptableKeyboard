@@ -66,8 +66,8 @@ public class FloatingButtonService extends Service {
             floatingButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d(TAG, "Floating button clicked - opening main app");
-                    openMainApp();
+                    Log.d(TAG, "Floating button clicked - sending Enter");
+                    sendEnterKey();
                 }
             });
             
@@ -96,13 +96,24 @@ public class FloatingButtonService extends Service {
                                 isDragging = true;
                                 params.x = initialX - (int) deltaX;
                                 params.y = initialY + (int) deltaY;
-                                windowManager.updateViewLayout(floatingButton, params);
+                                
+                                // Принудительно обновляем позицию
+                                try {
+                                    windowManager.updateViewLayout(floatingButton, params);
+                                    // Принудительно перерисовываем
+                                    floatingButton.invalidate();
+                                } catch (Exception e) {
+                                    Log.e(TAG, "Error updating button position", e);
+                                }
                             }
                             return true;
                             
                         case MotionEvent.ACTION_UP:
                             if (!isDragging) {
                                 v.performClick();
+                            } else {
+                                // После перетаскивания принудительно обновляем
+                                floatingButton.invalidate();
                             }
                             return true;
                     }
@@ -116,6 +127,36 @@ public class FloatingButtonService extends Service {
             
         } catch (Exception e) {
             Log.e(TAG, "Error creating floating button", e);
+        }
+    }
+    
+    private void sendEnterKey() {
+        try {
+            Log.d(TAG, "Sending Enter key");
+            
+            // Получаем активный KeyboardService
+            KeyboardService keyboardService = KeyboardService.getInstance();
+            if (keyboardService != null) {
+                keyboardService.sendEnter();
+                Log.d(TAG, "Enter key sent via KeyboardService");
+            } else {
+                Log.w(TAG, "KeyboardService not available");
+                
+                // Fallback - отправляем через системные события
+                sendEnterViaSystem();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error sending Enter key", e);
+        }
+    }
+    
+    private void sendEnterViaSystem() {
+        try {
+            // Используем Runtime для отправки Enter
+            Runtime.getRuntime().exec("input keyevent 66"); // 66 = KEYCODE_ENTER
+            Log.d(TAG, "Enter sent via system input");
+        } catch (Exception e) {
+            Log.e(TAG, "Error sending Enter via system", e);
         }
     }
     
