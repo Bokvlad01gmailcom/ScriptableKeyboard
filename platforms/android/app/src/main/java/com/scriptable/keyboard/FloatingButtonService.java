@@ -47,6 +47,7 @@ public class FloatingButtonService extends Service {
             floatingButton = new Button(this);
             ((Button) floatingButton).setText("⌨️");
             ((Button) floatingButton).setTextSize(24);
+            ((Button) floatingButton).setBackgroundColor(0x80000000); // Полупрозрачный фон
             
             // Параметры окна
             WindowManager.LayoutParams params = new WindowManager.LayoutParams(
@@ -97,11 +98,10 @@ public class FloatingButtonService extends Service {
                                 params.x = initialX - (int) deltaX;
                                 params.y = initialY + (int) deltaY;
                                 
-                                // Принудительно обновляем позицию
+                                // Убираем старую кнопку и добавляем на новое место
                                 try {
-                                    windowManager.updateViewLayout(floatingButton, params);
-                                    // Принудительно перерисовываем
-                                    floatingButton.invalidate();
+                                    windowManager.removeView(floatingButton);
+                                    windowManager.addView(floatingButton, params);
                                 } catch (Exception e) {
                                     Log.e(TAG, "Error updating button position", e);
                                 }
@@ -134,29 +134,26 @@ public class FloatingButtonService extends Service {
         try {
             Log.d(TAG, "Sending Enter key");
             
-            // Получаем активный KeyboardService
-            KeyboardService keyboardService = KeyboardService.getInstance();
-            if (keyboardService != null) {
-                keyboardService.sendEnter();
-                Log.d(TAG, "Enter key sent via KeyboardService");
-            } else {
-                Log.w(TAG, "KeyboardService not available");
-                
-                // Fallback - отправляем через системные события
-                sendEnterViaSystem();
-            }
+            // Прямая отправка через system input (более надежно)
+            new Thread(() -> {
+                try {
+                    Process process = Runtime.getRuntime().exec("su -c 'input keyevent 66'");
+                    process.waitFor();
+                    Log.d(TAG, "Enter sent via su input");
+                } catch (Exception e) {
+                    Log.w(TAG, "Su input failed, trying regular input");
+                    try {
+                        Process process = Runtime.getRuntime().exec("input keyevent 66");
+                        process.waitFor();
+                        Log.d(TAG, "Enter sent via regular input");
+                    } catch (Exception e2) {
+                        Log.e(TAG, "All input methods failed", e2);
+                    }
+                }
+            }).start();
+            
         } catch (Exception e) {
             Log.e(TAG, "Error sending Enter key", e);
-        }
-    }
-    
-    private void sendEnterViaSystem() {
-        try {
-            // Используем Runtime для отправки Enter
-            Runtime.getRuntime().exec("input keyevent 66"); // 66 = KEYCODE_ENTER
-            Log.d(TAG, "Enter sent via system input");
-        } catch (Exception e) {
-            Log.e(TAG, "Error sending Enter via system", e);
         }
     }
     

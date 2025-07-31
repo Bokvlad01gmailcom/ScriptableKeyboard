@@ -85,28 +85,8 @@
         <h1>Scriptable Keyboard</h1>
         <p>Расширяемая клавиатура с системой скриптов</p>
         
-        <a href="#" class="button" onclick="enableKeyboard()">
-            🔧 Включить клавиатуру в системе
-        </a>
-        
-        <a href="#" class="button" onclick="showFloatingButton()">
-            🎯 Показать плавающую кнопку
-        </a>
-        
-        <a href="#" class="button" onclick="openScriptManager()">
-            📜 Менеджер скриптов
-        </a>
-        
-        <a href="#" class="button" onclick="openSettings()">
-            ⚙️ Настройки
-        </a>
-        
-        <a href="#" class="button" onclick="Debug.showDebugPanel()" style="background: rgba(255,0,0,0.3);">
-            🐛 Debug Console
-        </a>
-        
-        <a href="#" class="button" onclick="sendLogsToTermux()" style="background: rgba(0,255,255,0.3);">
-            📤 Send Logs to Termux
+        <a href="#" class="button" onclick="toggleDebug()" id="debugToggle">
+            🐛
         </a>
         
         <div class="status" id="status">

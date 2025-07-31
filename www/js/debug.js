@@ -44,11 +44,11 @@ const Debug = {
             top: 10px;
             left: 10px;
             width: 90%;
-            height: 300px;
+            height: 400px;
             background: rgba(0,0,0,0.9);
             color: #00ff00;
             font-family: monospace;
-            font-size: 12px;
+            font-size: 11px;
             padding: 10px;
             border: 1px solid #333;
             border-radius: 5px;
@@ -59,23 +59,99 @@ const Debug = {
         const header = document.createElement('div');
         header.innerHTML = `
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <span>🐛 Debug Console (${this.logs.length} logs)</span>
+                <span>🐛 Debug Console</span>
                 <div>
-                    <button onclick="Debug.clearLogs()" style="margin-right: 5px;">Clear</button>
-                    <button onclick="Debug.exportLogs()">Export</button>
-                    <button onclick="Debug.hideDebugPanel()">✕</button>
+                    <button onclick="Debug.clearLogs()" style="margin-right: 5px; padding: 3px 6px; font-size: 10px;">Clear</button>
+                    <button onclick="sendLogsToTermux()" style="margin-right: 5px; padding: 3px 6px; font-size: 10px;">Send</button>
+                    <button onclick="Debug.hideDebugPanel()" style="padding: 3px 6px; font-size: 10px;">✕</button>
                 </div>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <input type="text" id="debugCommand" placeholder="Enter command..." style="width: 70%; padding: 3px; background: #222; color: #0f0; border: 1px solid #333; font-size: 10px;">
+                <button onclick="Debug.executeCommand()" style="padding: 3px 6px; font-size: 10px;">Run</button>
+            </div>
+            <div style="margin-bottom: 10px; font-size: 10px;">
+                <button onclick="Debug.addScript()" style="margin: 2px; padding: 2px 4px;">+ Script</button>
+                <button onclick="Debug.listScripts()" style="margin: 2px; padding: 2px 4px;">List</button>
+                <button onclick="Debug.testEnter()" style="margin: 2px; padding: 2px 4px;">Test Enter</button>
+                <button onclick="Debug.checkButton()" style="margin: 2px; padding: 2px 4px;">Check Button</button>
             </div>
         `;
         
         const content = document.createElement('div');
         content.id = 'debugContent';
+        content.style.height = '250px';
+        content.style.overflowY = 'auto';
         
         panel.appendChild(header);
         panel.appendChild(content);
         document.body.appendChild(panel);
         
+        // Enter для выполнения команд
+        document.getElementById('debugCommand').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.executeCommand();
+        });
+        
         this.updateDebugPanel();
+    },
+    
+    // Выполнить команду
+    executeCommand() {
+        const input = document.getElementById('debugCommand');
+        const command = input.value.trim();
+        if (!command) return;
+        
+        this.info('> ' + command);
+        
+        try {
+            const result = eval(command);
+            this.info('Result: ' + (result !== undefined ? result : 'undefined'));
+        } catch (e) {
+            this.error('Error: ' + e.message);
+        }
+        
+        input.value = '';
+    },
+    
+    // Добавить скрипт
+    addScript() {
+        const name = prompt('Script name:');
+        if (!name) return;
+        
+        const code = prompt('Script code:');
+        if (!code) return;
+        
+        const script = ScriptManager.createScript(name, code, '📜');
+        this.info('Script created: ' + script.id);
+    },
+    
+    // Список скриптов
+    listScripts() {
+        const scripts = ScriptManager.getAllScripts();
+        this.info('=== SCRIPTS ===');
+        scripts.forEach(script => {
+            this.info(`${script.icon} ${script.name} (${script.id})`);
+        });
+    },
+    
+    // Тест Enter
+    testEnter() {
+        this.info('Testing Enter key...');
+        if (typeof KeyboardPlugin !== 'undefined') {
+            KeyboardPlugin.sendEnter(
+                () => this.info('Enter sent successfully'),
+                (e) => this.error('Enter failed: ' + e)
+            );
+        } else {
+            this.error('KeyboardPlugin not available');
+        }
+    },
+    
+    // Проверка кнопки
+    checkButton() {
+        this.info('Checking floating button...');
+        this.info('floatingButtonVisible: ' + floatingButtonVisible);
+        this.info('Button element: ' + !!document.getElementById('floatingBtn'));
     },
     
     // Скрыть debug панель

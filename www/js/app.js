@@ -4,29 +4,34 @@ document.addEventListener('deviceready', onDeviceReady, false);
 let floatingButtonVisible = false;
 let keyboardActive = false;
 
+let debugMode = false;
+
 function onDeviceReady() {
     Debug.info('=== DEVICE READY ===');
-    Debug.info('Cordova готова!');
-    updateStatus('Приложение загружено');
+    updateStatus('Ready');
     
-    // Системная проверка
-    Debug.checkSystem();
-    
-    // Проверяем разрешения
+    // Минимальная инициализация
+    ScriptManager.init();
     checkPermissions();
     
-    // Инициализируем систему скриптов
-    ScriptManager.init();
+    Debug.info('App ready');
+}
+
+function toggleDebug() {
+    debugMode = !debugMode;
+    const btn = document.getElementById('debugToggle');
     
-    // Проверяем Intent - запущено ли из клавиатуры
-    checkLaunchIntent();
-    
-    // Автозапуск плавающей кнопки
-    setTimeout(() => {
-        forceShowFloatingButton();
-    }, 1000);
-    
-    Debug.info('App initialization completed');
+    if (debugMode) {
+        btn.textContent = '🔴';
+        btn.style.background = 'rgba(255,0,0,0.5)';
+        Debug.showDebugPanel();
+        updateStatus('Debug ON');
+    } else {
+        btn.textContent = '🐛';
+        btn.style.background = 'rgba(255,255,255,0.2)';
+        Debug.hideDebugPanel();
+        updateStatus('Debug OFF');
+    }
 }
 
 // Проверка Intent запуска
