@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 public class KeyboardPlugin extends CordovaPlugin {
     
     private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static KeyboardService keyboardService;
     
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -58,47 +59,73 @@ public class KeyboardPlugin extends CordovaPlugin {
     
     private void typeText(String text, CallbackContext callbackContext) {
         try {
-            // For now, just copy to clipboard - can be enhanced later
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) 
-                cordova.getActivity().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("keyboard_text", text);
-            clipboard.setPrimaryClip(clip);
-            callbackContext.success("Text copied to clipboard: " + text);
+            if (keyboardService != null) {
+                // Используем InputMethodService для прямого ввода
+                keyboardService.typeText(text);
+                callbackContext.success("Text typed via InputMethodService: " + text);
+            } else {
+                // Fallback - копируем в буфер обмена
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) 
+                    cordova.getActivity().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData.newPlainText("keyboard_text", text);
+                clipboard.setPrimaryClip(clip);
+                callbackContext.success("Text copied to clipboard: " + text);
+            }
         } catch (Exception e) {
             callbackContext.error("Error typing text: " + e.getMessage());
         }
     }
     
     private void sendBackspace(CallbackContext callbackContext) {
-        executor.execute(() -> {
-            try {
-                Instrumentation instrumentation = new Instrumentation();
-                instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_DEL);
-                cordova.getActivity().runOnUiThread(() -> {
-                    callbackContext.success("Backspace sent");
-                });
-            } catch (Exception e) {
-                cordova.getActivity().runOnUiThread(() -> {
-                    callbackContext.error("Error sending backspace: " + e.getMessage());
+        try {
+            if (keyboardService != null) {
+                keyboardService.sendBackspace();
+                callbackContext.success("Backspace sent via InputMethodService");
+            } else {
+                // Fallback через Instrumentation
+                executor.execute(() -> {
+                    try {
+                        Instrumentation instrumentation = new Instrumentation();
+                        instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_DEL);
+                        cordova.getActivity().runOnUiThread(() -> {
+                            callbackContext.success("Backspace sent via Instrumentation");
+                        });
+                    } catch (Exception e) {
+                        cordova.getActivity().runOnUiThread(() -> {
+                            callbackContext.error("Error sending backspace: " + e.getMessage());
+                        });
+                    }
                 });
             }
-        });
+        } catch (Exception e) {
+            callbackContext.error("Error sending backspace: " + e.getMessage());
+        }
     }
     
     private void sendEnter(CallbackContext callbackContext) {
-        executor.execute(() -> {
-            try {
-                Instrumentation instrumentation = new Instrumentation();
-                instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_ENTER);
-                cordova.getActivity().runOnUiThread(() -> {
-                    callbackContext.success("Enter sent");
-                });
-            } catch (Exception e) {
-                cordova.getActivity().runOnUiThread(() -> {
-                    callbackContext.error("Error sending enter: " + e.getMessage());
+        try {
+            if (keyboardService != null) {
+                keyboardService.sendEnter();
+                callbackContext.success("Enter sent via InputMethodService");
+            } else {
+                // Fallback через Instrumentation
+                executor.execute(() -> {
+                    try {
+                        Instrumentation instrumentation = new Instrumentation();
+                        instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_ENTER);
+                        cordova.getActivity().runOnUiThread(() -> {
+                            callbackContext.success("Enter sent via Instrumentation");
+                        });
+                    } catch (Exception e) {
+                        cordova.getActivity().runOnUiThread(() -> {
+                            callbackContext.error("Error sending enter: " + e.getMessage());
+                        });
+                    }
                 });
             }
-        });
+        } catch (Exception e) {
+            callbackContext.error("Error sending enter: " + e.getMessage());
+        }
     }
     
     private void openKeyboardSettings(CallbackContext callbackContext) {
@@ -144,5 +171,14 @@ public class KeyboardPlugin extends CordovaPlugin {
         } catch (Exception e) {
             callbackContext.error("Error requesting permissions: " + e.getMessage());
         }
+    }
+    
+    // Статические методы для связи с KeyboardService
+    public static void setKeyboardService(KeyboardService service) {
+        keyboardService = service;
+    }
+    
+    public static void clearKeyboardService() {
+        keyboardService = null;
     }
 }
