@@ -1,8 +1,10 @@
-name: Build APK
+name: Build Simple Keyboard APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -10,14 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
       
-    - name: Setup Node.js
+    - name: Setup Node.js 20
       uses: actions/setup-node@v4
       with:
         node-version: '20'
+        cache: 'npm'
         
-    - name: Setup Java
+    - name: Setup Java 17
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
@@ -25,20 +29,29 @@ jobs:
         
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
-      with:
-        packages: platforms;android-35 build-tools;35.0.0 platform-tools
+      
+    - name: Install Cordova CLI
+      run: npm install -g cordova@12
         
-    - name: Install Cordova
-      run: npm install -g cordova@latest
-        
-    - name: Install dependencies
+    - name: Install project dependencies
       run: npm install
+      working-directory: ./ScriptableKeyboard
         
-    - name: Build APK
+    - name: Add Android platform
+      run: cordova platform add android@latest
+      working-directory: ./ScriptableKeyboard
+
+    - name: Build debug APK
       run: cordova build android --debug
+      working-directory: ./ScriptableKeyboard
         
-    - name: Upload APK
+    - name: List APK files
+      run: find platforms/android -name "*.apk" -type f
+      working-directory: ./ScriptableKeyboard
+        
+    - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ScriptableKeyboard-APK
-        path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        name: simple-keyboard-apk-${{ github.sha }}
+        path: ScriptableKeyboard/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
